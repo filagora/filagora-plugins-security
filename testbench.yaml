@@ -1,0 +1,2 @@
+providers:
+  - Filagora\PluginsSecurity\PluginsSecurityServiceProvider

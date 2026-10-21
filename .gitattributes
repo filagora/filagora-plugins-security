@@ -1,0 +1,11 @@
+* text=auto eol=lf
+
+/.github export-ignore
+/.ddev export-ignore
+/tests export-ignore
+/.editorconfig export-ignore
+/.gitattributes export-ignore
+/phpstan.neon.dist export-ignore
+/phpunit.xml.dist export-ignore
+/pint.json export-ignore
+/testbench.yaml export-ignore

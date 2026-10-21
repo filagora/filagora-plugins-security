@@ -1,0 +1,60 @@
+# Starter PHP security ruleset for plugin release scanning.
+#
+# A small, low-false-positive starter set.
+rules:
+  - id: php-eval-request-data
+    languages: [php]
+    severity: ERROR
+    message: eval() on request data is remote code execution.
+    metadata:
+      category: security
+    pattern-either:
+      - pattern: eval($_GET[...])
+      - pattern: eval($_POST[...])
+      - pattern: eval($_REQUEST[...])
+      - pattern: eval($_COOKIE[...])
+
+  - id: php-unserialize-request-data
+    languages: [php]
+    severity: ERROR
+    message: unserialize() on request data enables PHP object injection.
+    metadata:
+      category: security
+    pattern-either:
+      - pattern: unserialize($_GET[...])
+      - pattern: unserialize($_POST[...])
+      - pattern: unserialize($_REQUEST[...])
+      - pattern: unserialize($_COOKIE[...])
+
+  - id: php-shell-exec-request-data
+    languages: [php]
+    severity: ERROR
+    message: Request data reaches a shell-execution function (command injection).
+    metadata:
+      category: security
+    pattern-either:
+      - pattern: system(<... $_GET[...] ...>)
+      - pattern: system(<... $_POST[...] ...>)
+      - pattern: system(<... $_REQUEST[...] ...>)
+      - pattern: shell_exec(<... $_GET[...] ...>)
+      - pattern: shell_exec(<... $_POST[...] ...>)
+      - pattern: shell_exec(<... $_REQUEST[...] ...>)
+      - pattern: exec(<... $_GET[...] ...>)
+      - pattern: exec(<... $_POST[...] ...>)
+      - pattern: exec(<... $_REQUEST[...] ...>)
+      - pattern: passthru(<... $_GET[...] ...>)
+      - pattern: passthru(<... $_POST[...] ...>)
+
+  - id: php-dynamic-include-request-data
+    languages: [php]
+    severity: ERROR
+    message: include/require of request data is local/remote file inclusion.
+    metadata:
+      category: security
+    pattern-either:
+      - pattern: include(<... $_GET[...] ...>)
+      - pattern: include_once(<... $_GET[...] ...>)
+      - pattern: require(<... $_GET[...] ...>)
+      - pattern: require_once(<... $_GET[...] ...>)
+      - pattern: include(<... $_REQUEST[...] ...>)
+      - pattern: require(<... $_REQUEST[...] ...>)

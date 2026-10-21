@@ -1,0 +1,12 @@
+name: release
+
+on:
+  push:
+    tags: ['v*']
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    uses: filagora/filagora-shared/.github/workflows/release.yml@master

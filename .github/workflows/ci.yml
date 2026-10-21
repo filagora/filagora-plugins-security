@@ -1,0 +1,20 @@
+name: ci
+
+on:
+  push:
+    branches: [master]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  tests:
+    uses: filagora/filagora-shared/.github/workflows/tests.yml@master
+
+  lint:
+    uses: filagora/filagora-shared/.github/workflows/lint.yml@master
+
+  leak-scan:
+    uses: filagora/filagora-shared/.github/workflows/leak-scan.yml@master
+    secrets: inherit

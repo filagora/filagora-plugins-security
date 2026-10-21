@@ -1,0 +1,16 @@
+includes:
+    - vendor/larastan/larastan/extension.neon
+
+parameters:
+    level: 6
+    # The package's own config/ is not the host app's config path; ArchTest guards src/ instead.
+    noEnvCallsOutsideOfConfig: false
+    paths:
+        - src
+        - config
+        - database
+    ignoreErrors:
+        # The service provider adds these relations to the release model, so static analysis cannot see them.
+        -
+            identifier: larastan.relationExistence
+            message: '#Relation .(securityScans|latestSecurityScan|quarantineScan|latestLlmReview). is not found in#'
