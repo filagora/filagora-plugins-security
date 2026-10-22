@@ -5,6 +5,10 @@ All notable changes to this package are documented here. The format follows
 
 ## [Unreleased]
 
+## [0.1.0] - 2026-10-22
+
+First release.
+
 ### Added
 
 - The scan tables (`plugin_release_security_scans`, `plugin_release_scan_finding_reviews`), their models, and the

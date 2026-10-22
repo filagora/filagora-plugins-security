@@ -50,8 +50,8 @@ class Quarantine
         // positive does not quarantine the release again on every re-scan.
         $severity = $this->accepted->effectiveSeverity($release, $scan);
 
-        if ($severity !== ScanSeverity::NONE && $severity->isAtLeast(Config::quarantineThreshold())) {
-            if (! $release->isQuarantined() && $this->canBeQuarantined($release)) {
+        if ($severity->isAtLeast(Config::quarantineThreshold())) {
+            if ($this->canBeQuarantined($release)) {
                 $this->quarantineAutomatically($release, $scan);
             }
 

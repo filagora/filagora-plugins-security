@@ -218,6 +218,31 @@ it('lifts a quarantine when a re-scan is clean, if asked to', function () {
     Event::assertDispatched(QuarantineCleared::class, fn (QuarantineCleared $event) => $event->moderator === null);
 });
 
+it('leaves a release that is not quarantined alone on a clean re-scan, even when asked to lift quarantines', function () {
+    config(['filagora-plugins-security.scanner.auto_clear_when_clean' => true]);
+    Event::fake([QuarantineCleared::class]);
+    $release = releaseWith();
+
+    evaluate($release, finishedScan($release, ScanSeverity::NONE, [], ScanTrigger::RESCAN));
+
+    Event::assertNotDispatched(QuarantineCleared::class);
+    expect($release->refresh()->quarantine_cleared_at)->toBeNull()->and(PluginModeratorNote::count())->toBe(0);
+});
+
+it('forgets an earlier clear when a release is quarantined again', function () {
+    $officer = securityOfficer();
+    $release = releaseWith();
+    app(Quarantine::class)->quarantine($release, $officer, 'first');
+    app(Quarantine::class)->clear($release->refresh(), $officer, 'fine');
+
+    app(Quarantine::class)->quarantine($release->refresh(), $officer, 'again');
+
+    $release->refresh();
+    expect($release->quarantine_cleared_at)->toBeNull()
+        ->and($release->quarantine_cleared_by_id)->toBeNull()
+        ->and($release->quarantine_note)->toBeNull();
+});
+
 it('keeps a quarantine on a clean re-scan unless asked to lift it', function () {
     $release = releaseWith();
     evaluate($release, finishedScan($release, ScanSeverity::CRITICAL, [finding(ScanSeverity::CRITICAL)]));
