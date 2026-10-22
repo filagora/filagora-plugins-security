@@ -18,6 +18,10 @@ All notable changes to this package are documented here. The format follows
 - The advisory AI review and the `LlmReviewer` contract the host binds.
 - An archive guard that keeps a release with an unaccepted serious finding active.
 - Events, and default emails that `mail.enabled` switches off.
+- Staff screens on the plugin releases screen of the plugins package (needs `filagora-plugins` 0.3): the scan result
+  and scanner version as columns with filters, the latest scan and AI review as modals, re-scan, AI review,
+  quarantine, clear and email-the-author actions, a bulk re-scan, and the scan history on the edit page with
+  accepting findings.
 
 ### Differences from the site this was extracted from
 

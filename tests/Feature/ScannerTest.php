@@ -262,3 +262,34 @@ it('scans an archive on a disk that is not local', function () {
     expect($scan->status)->toBe(ScanStatus::COMPLETED)
         ->and(collect($scan->findings)->pluck('rule_id')->all())->toContain('eval-construct');
 });
+
+it('stores exactly the findings limit without cutting anything', function () {
+    useAnalyzers(new FakeAnalyzer(fn () => AnalyzerResult::completed(array_map(
+        fn (int $i) => new ScanFinding('fake', 'rule-'.$i, ScanSeverity::LOW, 'Finding '.$i),
+        range(1, 5000),
+    ))));
+
+    $findings = scan(releaseWith())->findings;
+
+    expect($findings)->toHaveCount(5000)->and(collect($findings)->pluck('rule_id')->contains('findings-truncated'))->toBeFalse();
+});
+
+it('keeps a string of exactly the length limit whole', function () {
+    useAnalyzers(new FakeAnalyzer(fn () => AnalyzerResult::completed([
+        new ScanFinding('fake', 'rule', ScanSeverity::LOW, str_repeat('x', 20000)),
+    ])));
+
+    expect(scan(releaseWith())->findings[0]['title'])->toBe(str_repeat('x', 20000));
+});
+
+it('removes the temporary copy of an archive from a remote disk even when it cannot be unpacked', function () {
+    useStaticAnalyzerOnly();
+    $release = releaseWith(['../evil.php' => '<?php']);
+    Storage::fake('remote');
+    Storage::disk('remote')->put($release->zip_path, Storage::disk('local')->get($release->zip_path));
+    config(['filesystems.disks.remote.driver' => 's3', 'filagora-plugins.storage.disk' => 'remote']);
+    $before = glob(sys_get_temp_dir().'/filagora-archive-*') ?: [];
+
+    expect(scan($release)->status)->toBe(ScanStatus::FAILED)
+        ->and(glob(sys_get_temp_dir().'/filagora-archive-*') ?: [])->toBe($before);
+});

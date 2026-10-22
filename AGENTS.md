@@ -8,7 +8,7 @@ Guidance for AI coding agents working in `filagora-plugins-security`. `CLAUDE.md
 
 Part of Filagora, a family of MIT-licensed Laravel 13 / Filament 5 packages (forums, CMS, entitlements, logs, compliance, messages, search, push, memberships, plugins). Composer vendor `filagora`, namespace `Filagora\<Name>\` (here `Filagora\PluginsSecurity\`), default table prefix `filagora_`, commands `filagora:*`, env `FILAGORA_*`. Every package is pre-1.0 (`0.x`): the API may change between minor versions.
 
-Dependencies are declared in `composer.json` (`require` is hard, `suggest` is optional). Other packages must keep working when an optional one is absent; each package's `tests/Entitlements` directory proves that. Until `filagora-plugins` is on Packagist, `composer.json` carries a `repositories` entry for it; remove it once it is.
+Dependencies are declared in `composer.json` (`require` is hard, `suggest` is optional). Other packages must keep working when an optional one is absent; each package's `tests/Entitlements` directory proves that.
 
 ## Layout
 
@@ -23,6 +23,7 @@ Dependencies are declared in `composer.json` (`require` is hard, `suggest` is op
 - Analyzer output comes from arbitrary uploaded bytes: strings are scrubbed to valid UTF-8 and bounded, the stored findings are capped, and the archive is checked again (zip-slip, entry count, size) before it is extracted. Never run code from an archive.
 - Everything provider-specific stays out: the AI review talks to the host's `LlmReviewer`, and the package knows no HTTP client or model. The plugin type to review for is `analyzers.llm.subject`.
 - The `securityScans`, `latestSecurityScan`, `quarantineScan` and `latestLlmReview` relations are added to the configured release model in the service provider (`resolveRelationUsing`); `phpstan.neon.dist` ignores Larastan not seeing them.
+- The screens add themselves to the plugins package's release screens through `ReleaseScreens` (in `FilagoraPluginsSecurityPlugin::register()`, keyed so a second panel adds nothing). Every column, filter and action is gated by `StaffAccess::allowed()`, and the services check the key again; a refusal can only happen in a race, and is shown as a notice. Filament's test helpers do not render an action modal's content: ask the component for `getMountedActionSchema()` (see `ScreensTest`).
 - The scan tables match the live definitions of the site the package was extracted from, so an existing site can adopt them with `filagora:adopt`; the foreign keys on `plugin_releases` are a schema extension of the plugins package.
 
 ## Commands

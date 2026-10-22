@@ -89,6 +89,19 @@ $this->app->bind(\Filagora\PluginsSecurity\Contracts\LlmReviewer::class, MyRevie
 implementation. Then set `analyzers.llm.enabled`. A review is a scan of kind `llm`: it never becomes the release's
 latest scan, and only the person who asked is emailed.
 
+## Staff screens
+
+Register `FilagoraPluginsSecurityPlugin::make()` on the Filament panel that has `FilagoraPluginsPlugin`. It adds to the
+plugin releases screen (through the plugins package's `ReleaseScreens`), for anyone the access checker allows
+`filagora.plugins.security`; everyone else sees none of it:
+
+- the latest scan's severity and scanner version as columns (a stale version is marked), and filters for both;
+- **Security scan** and **AI review** on each row, which open the latest result, findings and all;
+- **Re-scan**, **AI review** (when a model is connected), **Quarantine** and **Clear quarantine** (each asks for a
+  reason), and **Email latest scan to author**; and **Re-scan (security)** for several selected releases;
+- on the release's edit page, **Security scans**: every scan and review, newest first, to open, filter, and mark the
+  findings of a standard scan reviewed.
+
 ## Events and mail
 
 `ScanFinished`, `ReleaseQuarantined` (with whether to tell the authors), `QuarantineCleared`, `SeriousFindingFlagged`
