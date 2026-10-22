@@ -36,8 +36,19 @@ final class SendSecurityMail
             return;
         }
 
-        $release = $event->release;
-        $scan = $event->scan;
+        $this->tellAuthorsTheResult($event->release, $event->scan);
+    }
+
+    /**
+     * Email the uploader and the owner how a scan went, whatever started it. The dashboard offers
+     * this to resend the latest result.
+     */
+    public function tellAuthorsTheResult(PluginRelease $release, SecurityScan $scan): void
+    {
+        if (! $this->enabled()) {
+            return;
+        }
+
         $severity = $scan->severity();
         $failed = $scan->status === ScanStatus::FAILED;
 

@@ -14,3 +14,6 @@ parameters:
         -
             identifier: larastan.relationExistence
             message: '#Relation .(securityScans|latestSecurityScan|quarantineScan|latestLlmReview). is not found in#'
+        -
+            identifier: property.notFound
+            message: '#Access to an undefined property Filagora\\Plugins\\Models\\PluginRelease::\$(securityScans|latestSecurityScan|quarantineScan|latestLlmReview)\.#'
