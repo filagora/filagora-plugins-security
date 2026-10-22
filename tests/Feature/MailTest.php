@@ -229,11 +229,19 @@ describe('the email', function () {
             ->and($mail->actionUrl)->toEndWith('/plugins/'.$release->plugin->getRouteKey());
     });
 
-    it('has no link when no route is set, or the dashboard is not there for staff', function () {
+    it('has no link for an author when no route is set', function () {
         [$release, $owner] = ownedRelease();
 
-        expect(rendered(new SecurityNotification('quarantined', $release, ['plugin' => 'W', 'version' => '1']), $owner)->actionUrl)->toBeNull()
-            ->and(rendered(new SecurityNotification('finding_flagged', $release, ['plugin' => 'W', 'version' => '1', 'severity' => 'High'], forStaff: true), $owner)->actionUrl)->toBeNull();
+        expect(rendered(new SecurityNotification('quarantined', $release, ['plugin' => 'W', 'version' => '1']), $owner)->actionUrl)->toBeNull();
+    });
+
+    it('links staff to the release in the dashboard', function () {
+        [$release, $owner] = ownedRelease();
+
+        $mail = rendered(new SecurityNotification('finding_flagged', $release, ['plugin' => 'W', 'version' => '1', 'severity' => 'High'], forStaff: true), $owner);
+
+        expect($mail->actionText)->toBe('Review the release')
+            ->and($mail->actionUrl)->toEndWith("/admin/plugin-releases/{$release->id}/edit");
     });
 
     it('is queued and goes by mail', function () {

@@ -11,6 +11,7 @@ use Filagora\Core\CoreServiceProvider;
 use Filagora\Plugins\PluginsServiceProvider;
 use Filagora\PluginsSecurity\PluginsSecurityServiceProvider;
 use Filagora\PluginsSecurity\Tests\Support\GrantedKeys;
+use Filagora\PluginsSecurity\Tests\Support\TestPanelProvider;
 use Filagora\PluginsSecurity\Tests\Support\TestSupportServiceProvider;
 use Filagora\PluginsSecurity\Tests\Support\TestUser;
 use Filament\Actions\ActionsServiceProvider;
@@ -46,6 +47,7 @@ abstract class TestCase extends Orchestra
             PluginsServiceProvider::class,
             PluginsSecurityServiceProvider::class,
             TestSupportServiceProvider::class,
+            TestPanelProvider::class,
         ];
     }
 
