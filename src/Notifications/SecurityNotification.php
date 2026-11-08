@@ -45,7 +45,7 @@ final class SecurityNotification extends Notification implements ShouldQueue
 
     public function toMail(object $notifiable): MailMessage
     {
-        $mail = (new MailMessage)
+        $mail = $this->fromSupportAddress(new MailMessage)
             ->subject(__("filagora-plugins-security::notifications.{$this->kind}.subject", $this->replace))
             ->line(__("filagora-plugins-security::notifications.{$this->kind}.intro", $this->replace));
 
@@ -74,5 +74,23 @@ final class SecurityNotification extends Notification implements ShouldQueue
         } catch (Throwable) {
             return null;
         }
+    }
+
+    /**
+     * Like the plugin mail, security mail comes from the plugin support address
+     * (`filagora-plugins.mail.support_email`) when it is a valid address, else from the application's own.
+     */
+    private function fromSupportAddress(MailMessage $message): MailMessage
+    {
+        $configured = trim((string) config('filagora-plugins.mail.support_email'));
+        $address = filter_var($configured, FILTER_VALIDATE_EMAIL) !== false ? $configured : trim((string) config('mail.from.address', ''));
+
+        if (filter_var($address, FILTER_VALIDATE_EMAIL) === false) {
+            return $message;
+        }
+
+        $name = config('mail.from.name');
+
+        return $message->from($address, is_string($name) && $name !== '' ? $name : null);
     }
 }

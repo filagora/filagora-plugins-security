@@ -5,6 +5,10 @@ All notable changes to this package are documented here. The format follows
 
 ## [Unreleased]
 
+### Changed
+
+- Security mail is sent from the plugin support address (`filagora-plugins.mail.support_email`) when it is a valid address, else from the application's own, as the plugin mail already was.
+
 ## [0.1.0] - 2026-10-22
 
 First release.

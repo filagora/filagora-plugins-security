@@ -252,3 +252,32 @@ describe('the email', function () {
             ->and($notification->via(new stdClass))->toBe(['mail']);
     });
 });
+
+describe('the sender', function () {
+    it('is the plugin support address when one is set', function () {
+        [$release] = ownedRelease();
+        config(['mail.from.address' => 'noreply@example.test', 'mail.from.name' => 'Site']);
+
+        $mail = rendered(new SecurityNotification('quarantine_cleared', $release), TestUser::make('Author'));
+
+        expect($mail->from)->toBe(['support@example.test', 'Site']);
+    });
+
+    it('falls back to the application address when the support address is not valid', function () {
+        [$release] = ownedRelease();
+        config(['filagora-plugins.mail.support_email' => 'not an address', 'mail.from.address' => 'noreply@example.test']);
+
+        $mail = rendered(new SecurityNotification('quarantine_cleared', $release), TestUser::make('Author'));
+
+        expect($mail->from[0])->toBe('noreply@example.test');
+    });
+
+    it('leaves the sender alone when neither address is usable', function () {
+        [$release] = ownedRelease();
+        config(['filagora-plugins.mail.support_email' => '', 'mail.from.address' => '']);
+
+        $mail = rendered(new SecurityNotification('quarantine_cleared', $release), TestUser::make('Author'));
+
+        expect($mail->from)->toBe([]);
+    });
+});
