@@ -6,6 +6,7 @@ namespace Filagora\PluginsSecurity\Notifications;
 
 use Filagora\Plugins\Filament\Resources\PluginReleases\PluginReleaseResource;
 use Filagora\Plugins\Models\PluginRelease;
+use Filagora\PluginsSecurity\Models\SecurityScan;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
@@ -18,14 +19,19 @@ use Throwable;
  * `filagora-plugins-security::notifications.{kind}` (a `subject`, an `intro` and an `action`);
  * override the language file to reword them. Authors are linked to the route named in
  * `filagora-plugins.routes.plugin`, staff to the release's page in the dashboard, when there is one.
+ *
+ * A host that wants other words or another layout extends this class, overrides `toMail()` and names
+ * the class in `filagora-plugins-security.mail.notification`; the scan the mail is about is `$scan`
+ * (none for a lifted hold).
  */
-final class SecurityNotification extends Notification implements ShouldQueue
+class SecurityNotification extends Notification implements ShouldQueue
 {
     use Queueable;
 
     /**
      * @param  array<string, scalar|null>  $replace  Values for the placeholders in the words.
      * @param  list<string>  $details  Extra lines under the intro.
+     * @param  SecurityScan|null  $scan  The scan the mail is about, when there is one.
      */
     public function __construct(
         public readonly string $kind,
@@ -33,6 +39,7 @@ final class SecurityNotification extends Notification implements ShouldQueue
         public readonly array $replace = [],
         public readonly array $details = [],
         public readonly bool $forStaff = false,
+        public readonly ?SecurityScan $scan = null,
     ) {}
 
     /**

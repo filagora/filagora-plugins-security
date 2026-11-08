@@ -114,11 +114,14 @@ return [
     |--------------------------------------------------------------------------
     |
     | `enabled` switches the default emails off (listen to the package's events instead). Staff
-    | alerts go to `filagora-plugins.mail.support_email`.
+    | alerts go to `filagora-plugins.mail.support_email`. `notification` names a subclass of
+    | `Notifications\SecurityNotification` that builds the mail with a host's own words and layout; the
+    | dashboard's "email the result again" action uses it too.
     |
     */
     'mail' => [
         'enabled' => true,
+        'notification' => null,
     ],
 
     /*

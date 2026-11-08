@@ -281,3 +281,25 @@ describe('the sender', function () {
         expect($mail->from)->toBe([]);
     });
 });
+
+describe('a host\'s own notification class', function () {
+    it('builds the mail for every event when named in the config', function () {
+        [$release, $owner, $uploader] = ownedRelease();
+        config(['filagora-plugins-security.mail.notification' => HostSecurityNotification::class]);
+
+        ScanFinished::dispatch($release, $scan = finishedScan($release));
+
+        Notification::assertSentTo($uploader, HostSecurityNotification::class, fn (HostSecurityNotification $n) => $n->scan?->is($scan) === true);
+    });
+
+    it('ignores a class that is not a SecurityNotification', function () {
+        [$release, , $uploader] = ownedRelease();
+        config(['filagora-plugins-security.mail.notification' => stdClass::class]);
+
+        ScanFinished::dispatch($release, finishedScan($release));
+
+        Notification::assertSentTo($uploader, SecurityNotification::class);
+    });
+});
+
+class HostSecurityNotification extends SecurityNotification {}

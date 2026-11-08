@@ -5,6 +5,12 @@ All notable changes to this package are documented here. The format follows
 
 ## [Unreleased]
 
+## [0.1.1] - 2026-11-08
+
+### Added
+
+- `filagora-plugins-security.mail.notification`: a host can name a subclass of `SecurityNotification` to build the mail with its own words and layout. `SecurityNotification` is no longer `final` and carries the `$scan` the mail is about. The dashboard's "email the result again" action uses the host's class too.
+
 ### Changed
 
 - Security mail is sent from the plugin support address (`filagora-plugins.mail.support_email`) when it is a valid address, else from the application's own, as the plugin mail already was.

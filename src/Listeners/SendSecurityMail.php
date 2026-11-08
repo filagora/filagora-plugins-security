@@ -68,7 +68,7 @@ final class SendSecurityMail
             default => __('filagora-plugins-security::notifications.scan_complete.status_pending'),
         };
 
-        $this->tellAuthors($release, new SecurityNotification('scan_complete', $release, $this->replace($release), [$outcome, $status]));
+        $this->tellAuthors($release, $this->notification('scan_complete', $release, $this->replace($release), [$outcome, $status], scan: $scan));
     }
 
     public function quarantined(ReleaseQuarantined $event): void
@@ -81,7 +81,7 @@ final class SendSecurityMail
             ? [__('filagora-plugins-security::notifications.quarantined.reference', ['scan' => $event->scan->getKey(), 'version' => $event->scan->scanner_version])]
             : [];
 
-        $this->tellAuthors($event->release, new SecurityNotification('quarantined', $event->release, $this->replace($event->release), $details));
+        $this->tellAuthors($event->release, $this->notification('quarantined', $event->release, $this->replace($event->release), $details, scan: $event->scan));
     }
 
     public function cleared(QuarantineCleared $event): void
@@ -89,7 +89,7 @@ final class SendSecurityMail
         $uploader = Users::of($event->release->uploadedBy);
 
         if ($this->enabled() && $uploader !== null) {
-            Notification::send($uploader, new SecurityNotification('quarantine_cleared', $event->release, $this->replace($event->release)));
+            Notification::send($uploader, $this->notification('quarantine_cleared', $event->release, $this->replace($event->release)));
         }
     }
 
@@ -107,7 +107,7 @@ final class SendSecurityMail
             ->map(static fn (int $count, string $severity): string => "{$severity}: {$count}")
             ->implode(', ');
 
-        Notification::route('mail', $support)->notify(new SecurityNotification(
+        Notification::route('mail', $support)->notify($this->notification(
             'finding_flagged',
             $release,
             $this->replace($release) + ['severity' => $event->scan->severity()->label()],
@@ -118,6 +118,7 @@ final class SendSecurityMail
                     : __('filagora-plugins-security::notifications.finding_flagged.public'),
             ],
             forStaff: true,
+            scan: $event->scan,
         ));
     }
 
@@ -138,13 +139,29 @@ final class SendSecurityMail
             ->map(static fn (int $count, string $severity): string => "{$severity}: {$count}")
             ->implode(', ');
 
-        Notification::send($requester, new SecurityNotification(
+        Notification::send($requester, $this->notification(
             $failed ? 'review_failed' : 'review_finished',
             $event->release,
             $this->replace($event->release) + ['severity' => $event->scan->severity()->label(), 'error' => (string) $event->scan->error],
             $failed ? [] : [__('filagora-plugins-security::notifications.review_finished.counts', ['counts' => $counts !== '' ? $counts : '-'])],
             forStaff: true,
+            scan: $event->scan,
         ));
+    }
+
+    /**
+     * The mail for one event: the host's class from `filagora-plugins-security.mail.notification`
+     * when it names a `SecurityNotification` subclass, else the package's own.
+     *
+     * @param  array<string, scalar|null>  $replace
+     * @param  list<string>  $details
+     */
+    private function notification(string $kind, PluginRelease $release, array $replace, array $details = [], bool $forStaff = false, ?SecurityScan $scan = null): SecurityNotification
+    {
+        $class = config('filagora-plugins-security.mail.notification');
+        $class = is_string($class) && is_a($class, SecurityNotification::class, true) ? $class : SecurityNotification::class;
+
+        return new $class($kind, $release, $replace, $details, $forStaff, $scan);
     }
 
     private function tellAuthors(PluginRelease $release, SecurityNotification $notification): void
