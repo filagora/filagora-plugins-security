@@ -7,19 +7,16 @@ finding, clear a quarantine or ask a language model for a second opinion.
 > The package is at `0.1`: the API may change between `0.x` minor versions. It is a scanner, a quarantine service and
 > staff screens; it has no public pages.
 
-## Requirements
+## What it provides
 
-PHP 8.4 with `ext-zip`, Laravel 13, Filament 5, `filagora/filagora-core` and `filagora/filagora-plugins`. Tested
-against MariaDB 11.4. ClamAV, Semgrep and a language model are optional and off until you set them up.
-
-## Tables
+### Tables
 
 `plugin_release_security_scans` (one row per scan) and `plugin_release_scan_finding_reviews` (findings a moderator
 accepted, by fingerprint), prefixed `filagora_` by default, plus the two foreign keys from `plugin_releases` to a
 scan (`latest_security_scan_id`, `quarantine_scan_id`), which the plugins package ships as plain columns. A site
 that already has these tables can adopt them with `php artisan filagora:adopt`.
 
-## How a scan works
+### How a scan works
 
 When a release is submitted (`ReleaseSubmitted` from the plugins package), a `ScanReleaseJob` is queued. It unpacks
 the archive into a private temporary directory (checking the paths and sizes again), runs each analyzer, and records
@@ -43,7 +40,7 @@ Each is switched on or off in `config/filagora-plugins-security.php`; one that i
 recorded as skipped and never fails the scan. Add your own with `Analyzers::register()` and the `ReleaseAnalyzer`
 contract (it must never run code from the archive).
 
-## Keeping scans current
+### Keeping scans current
 
 Raise `scanner.version` whenever the analyzers or their rules change. A release whose latest scan used an older
 version is stale. Schedule the sweep to re-scan a few at a time, so a version bump does not drop dozens of
@@ -57,7 +54,7 @@ Schedule::command('filagora:plugins:security-sweep')->everyThirtyMinutes();
 `--sync`, `--dry-run`), and `--prune` deletes redundant scan history, keeping the latest scan, the one behind a
 quarantine and the newest of each scanner version. Give the jobs a queue of their own with `scanner.queue`.
 
-## Quarantine and accepted findings
+### Quarantine and accepted findings
 
 ```php
 $quarantine = app(\Filagora\PluginsSecurity\Services\Quarantine::class);
@@ -74,7 +71,7 @@ of the same code, so accepting it once stops it counting for that plugin from th
 A release whose latest scan still holds a finding at or above `archive.keep_at_severity` (default `high`) that nobody
 has accepted is kept active when old releases are archived.
 
-## AI review
+### AI review
 
 An advisory review by a language model, run only when staff ask for it (it costs money). The package builds the
 prompts, batches the source, treats the plugin's code as data, drops findings that name a file or quote code that is
@@ -89,7 +86,7 @@ $this->app->bind(\Filagora\PluginsSecurity\Contracts\LlmReviewer::class, MyRevie
 implementation. Then set `analyzers.llm.enabled`. A review is a scan of kind `llm`: it never becomes the release's
 latest scan, and only the person who asked is emailed.
 
-## Staff screens
+### Staff screens
 
 Register `FilagoraPluginsSecurityPlugin::make()` on the Filament panel that has `FilagoraPluginsPlugin`. It adds to the
 plugin releases screen (through the plugins package's `ReleaseScreens`), for anyone the access checker allows
@@ -102,14 +99,58 @@ plugin releases screen (through the plugins package's `ReleaseScreens`), for any
 - on the release's edit page, **Security scans**: every scan and review, newest first, to open, filter, and mark the
   findings of a standard scan reviewed.
 
-## Events and mail
+### Events and mail
 
 `ScanFinished`, `ReleaseQuarantined` (with whether to tell the authors), `QuarantineCleared`, `SeriousFindingFlagged`
 (uploads only) and `LlmReviewFinished`. The default emails read their words from
 `resources/lang/en/notifications.php`; set `mail.enabled` to false to send your own from the events.
+
+## Requirements
+
+PHP 8.4 with `ext-zip`, Laravel 13, Filament 5, `filagora/filagora-core` and `filagora/filagora-plugins`. Tested
+against MariaDB 11.4. ClamAV, Semgrep and a language model are optional and off until you set them up.
+
+## Install
+
+```bash
+composer require filagora/filagora-plugins-security
+php artisan vendor:publish --tag=filagora-plugins-security-config
+php artisan migrate
+```
+
+Register the plugin on a Filament panel:
+
+```php
+->plugin(\Filagora\PluginsSecurity\FilagoraPluginsSecurityPlugin::make())
+```
+
+A site that already has the tables runs `php artisan filagora:adopt` instead of migrating.
+
+## Configuration
+
+`config/filagora-plugins-security.php` is merged with the host's copy, so list only what
+differs. Publish it with `php artisan vendor:publish --tag=filagora-plugins-security-config`.
+
+## Extending
+
+Extend through documented contracts, events and registries. Anything not documented
+is `@internal`.
 
 ## Testing
 
 ```bash
 composer test
 ```
+
+Tests run against a real MariaDB, never SQLite, so engine behaviour (FULLTEXT,
+`ONLY_FULL_GROUP_BY`, collation) matches production. Host and credentials come from
+your environment; the database is always named `testing`, never your development one.
+
+## Local development (DDEV)
+
+`.ddev/` is included. `ddev start` creates both `db` and `testing` (run `ddev restart` once
+if `testing` is missing), then `ddev exec vendor/bin/pest`.
+
+## Licence
+
+MIT. See [LICENSE](LICENSE).
