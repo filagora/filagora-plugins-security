@@ -5,6 +5,12 @@ All notable changes to this package are documented here. The format follows
 
 ## [Unreleased]
 
+## [0.1.3] - 2026-11-13
+
+### Changed
+
+- The README's What it provides section has the same sub-sections as every other Filagora package (Overview, Tables, Commands, Events, Access, Using it). No code changes.
+
 ## [0.1.2] - 2026-11-13
 
 ### Changed
