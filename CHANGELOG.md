@@ -5,6 +5,12 @@ All notable changes to this package are documented here. The format follows
 
 ## [Unreleased]
 
+## [0.1.2] - 2026-11-13
+
+### Changed
+
+- The README follows the layout shared by every Filagora package (What it provides, Requirements, Install, Configuration, Extending, Testing, Local development, Licence), so the docs page built from it reads the same as the others. No code changes.
+
 ## [0.1.1] - 2026-11-08
 
 ### Added
