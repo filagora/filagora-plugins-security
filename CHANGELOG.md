@@ -5,6 +5,12 @@ All notable changes to this package are documented here. The format follows
 
 ## [Unreleased]
 
+## [0.1.4] - 2026-11-14
+
+### Changed
+
+- The licence names Ian Wilson as the copyright holder. No code changes.
+
 ## [0.1.3] - 2026-11-13
 
 ### Changed
