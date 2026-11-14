@@ -21,3 +21,8 @@ composer analyse   # Larastan
   SemVer; everything else is `@internal`.
 - Do not add private hostnames, IP addresses or personal email addresses to code,
   docs or test fixtures. CI runs a leak scan.
+
+## Licence
+
+This project is MIT licensed (see [LICENSE](LICENSE)). By submitting a pull request you agree
+that your contribution is licensed under the same MIT License.
