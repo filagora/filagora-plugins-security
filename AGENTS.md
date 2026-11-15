@@ -54,7 +54,7 @@ Tests always run against MariaDB (database `testing`, forced in `phpunit.xml.dis
 - README and `CHANGELOG.md` (`[Unreleased]`) are updated in the same change.
 - `composer test`, `composer lint` and `composer analyse` pass.
 - Work on a branch and open a pull request (`gh pr merge --squash --delete-branch`). `master` is protected and squash-only.
-- Confirm with the user before tagging a release, creating or deleting repositories or branches, or anything else outward-facing. Tags create the GitHub release from the matching `CHANGELOG.md` section; the user submits new packages to Packagist.
+- Confirm with the user before tagging a release, creating or deleting repositories or branches, or anything else outward-facing. Merging a "Prepare x.y.z" PR tags that version automatically (`.github/workflows/tag.yml`, from the newest `## [x.y.z]` changelog heading) and creates the GitHub release from that section, so a merged Prepare PR is a release: get the user's go-ahead before merging one. The user submits new packages to Packagist.
 
 ## Public repository: keep private details out
 
