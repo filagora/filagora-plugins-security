@@ -1,0 +1,12 @@
+name: tag
+
+on:
+  push:
+    branches: [master]
+
+permissions:
+  contents: write
+
+jobs:
+  tag:
+    uses: filagora/filagora-shared/.github/workflows/tag.yml@master
