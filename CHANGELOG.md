@@ -5,6 +5,12 @@ All notable changes to this package are documented here. The format follows
 
 ## [Unreleased]
 
+## [0.1.5] - 2026-11-17
+
+### Changed
+
+- Accepts `filagora/filagora-plugins` 0.4 as well as 0.3 (`^0.3 || ^0.4`). 0.4 adds rate limits and cache headers to that package's JSON API; nothing here changes.
+
 ## [0.1.4] - 2026-11-14
 
 ### Changed
