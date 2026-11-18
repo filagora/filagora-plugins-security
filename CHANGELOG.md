@@ -5,6 +5,12 @@ All notable changes to this package are documented here. The format follows
 
 ## [Unreleased]
 
+## [0.1.6] - 2026-11-18
+
+### Changed
+
+- Accepts `filagora/filagora-plugins` 0.5 as well as 0.3 and 0.4 (`^0.3 || ^0.4 || ^0.5`). 0.5 ships an OpenAPI description of that package's JSON API; nothing here changes.
+
 ## [0.1.5] - 2026-11-17
 
 ### Changed
