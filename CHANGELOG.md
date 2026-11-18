@@ -5,6 +5,12 @@ All notable changes to this package are documented here. The format follows
 
 ## [Unreleased]
 
+## [0.1.7] - 2026-11-18
+
+### Changed
+
+- Accepts any `filagora/filagora-plugins` from 0.3 up to, not including, 1.0 (`>=0.3 <1.0`), where it listed each minor (`^0.3 || ^0.4 || ^0.5`). A new minor of that package no longer needs a release of this one before a site can take it. Tested against 0.6; this package's CI installs the newest version in the range, so a later minor that breaks something here shows up the next time CI runs.
+
 ## [0.1.6] - 2026-11-18
 
 ### Changed
